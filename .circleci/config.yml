@@ -3,7 +3,6 @@ version: 2.1
 
 jobs:
   build-and-test:
-    executor: python/default
     docker:
       - image: circleci/python3.7.7
     steps:
