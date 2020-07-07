@@ -3,7 +3,7 @@ import os
 from sys import path
 
 
-path.append('../src')
+path.append('src')
 
 from controlArchivosLinux import ControlArchivosLinux
 
@@ -14,46 +14,46 @@ from controlArchivosLinux import ControlArchivosLinux
 
 def test_controlArchivos_borrarArchivo():
 
-    for f in os.listdir(os.path.abspath("basura")):
-        os.remove(os.path.abspath("basura")+"/"+f)
+    for f in os.listdir(os.path.abspath("test/basura")):
+        os.remove(os.path.abspath("test/basura")+"/"+f)
 
 
     CAL = ControlArchivosLinux()
 
-    archivo = open("basura/test.test", "a")
+    archivo = open("test/basura/test.test", "a")
 
     archivo.close()
 
-    resultado = CAL.borrarArchivo(os.path.abspath("basura/test.test"))
+    resultado = CAL.borrarArchivo(os.path.abspath("test/basura/test.test"))
 
-    for f in os.listdir(os.path.abspath("basura")):
-        os.remove(os.path.abspath("basura")+"/"+f)
+    for f in os.listdir(os.path.abspath("test/basura")):
+        os.remove(os.path.abspath("test/basura")+"/"+f)
 
     assert resultado == True
 
 
 def test_controlArchivos_buscarRutasAudios():
 
-    for f in os.listdir(os.path.abspath("basura")):
-        os.remove(os.path.abspath("basura")+"/"+f)
+    for f in os.listdir(os.path.abspath("test/basura")):
+        os.remove(os.path.abspath("test/basura")+"/"+f)
 
     CAL = ControlArchivosLinux()
 
-    audio_fake_1 = open("basura/test1.wav", "a")
+    audio_fake_1 = open("test/basura/test1.wav", "a")
 
     audio_fake_1.close()
 
-    audio_fake_2 = open("basura/test2.wav", "a")
+    audio_fake_2 = open("test/basura/test2.wav", "a")
 
     audio_fake_2.close()
 
-    other = open("basura/test.wa", "a")
+    other = open("test/basura/test.wa", "a")
 
     other.close()
 
-    resultado = CAL.buscarRutasAudios(os.path.abspath("basura"))
+    resultado = CAL.buscarRutasAudios(os.path.abspath("test/basura"))
 
-    for f in os.listdir(os.path.abspath("basura")):
-        os.remove(os.path.abspath("basura")+"/"+f)
+    for f in os.listdir(os.path.abspath("test/basura")):
+        os.remove(os.path.abspath("test/basura")+"/"+f)
 
     assert len(resultado) == 2
