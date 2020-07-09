@@ -1,4 +1,8 @@
-from interfaces.controlArchivos import ControlArchivos
+from sys import path
+
+path.append('../interfaz')
+
+from controlArchivos import ControlArchivos
 
 from os import remove, listdir
 from os.path import isfile, join
