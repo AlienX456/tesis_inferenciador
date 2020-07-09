@@ -3,7 +3,7 @@ from sys import path
 #argumentos libreria
 import argparse
 
-path.append('../../interfaces')
+path.append('../interfaz')
 
 #interfaz
 from inferenciador import Inferenciador
@@ -195,7 +195,11 @@ class Dcase_Adapatask5(Inferenciador):
             print('Device: ', self.device)
 
             self.model = Task5Model(31).to(self.device)
-            self.model.load_state_dict(torch.load('./data/model_system1'))
+
+            if cuda:
+                self.model.load_state_dict(torch.load('./data/model_system1'))
+            else:
+                self.model.load_state_dict(torch.load('./data/model_system1',map_location='cpu'))
             
             return True
 
@@ -231,9 +235,7 @@ def main():
 
     if result:
 
-        df = inferenciador.inferirAudio('/home/esteban/Documentos/Tesis/dcase2019-task5-urban-sound-tagging/data/validate/05_001151.wav')
-
-        
+        df = inferenciador.inferirAudio('/audios/05_001151.wav')
 
         print(df)
 

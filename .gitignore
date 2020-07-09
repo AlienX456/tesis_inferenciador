@@ -4,3 +4,4 @@ src/__pycache__
 src/interfaces/__pycache__
 .pytest_cache
 src/inferenciador_imp/adapa/data/model_system1
+src/inferenciador_adapa/adapa/data/model_system1
