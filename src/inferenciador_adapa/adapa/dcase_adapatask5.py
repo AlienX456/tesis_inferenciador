@@ -92,6 +92,7 @@ class Dcase_Adapatask5(Inferenciador):
     def __init__(self):
         self.device = None
         self.model = None
+        self.data_path = None
 
     
     #interfaz
@@ -100,15 +101,15 @@ class Dcase_Adapatask5(Inferenciador):
 
         try:
 
-            logmel = compute_melspec(ruta)
+            logmel = compute_melspec('/audios/'+ruta)
 
 
             X = np.expand_dims(logmel.T[:635, :], axis=0)
 
             X = X[:, None, :, :]
 
-            channel_means = np.load('./data/channel_means.npy')
-            channel_stds = np.load('./data/channel_stds.npy')
+            channel_means = np.load(self.data_path+'channel_means.npy')
+            channel_stds = np.load(self.data_path+'channel_stds.npy')
             X = (X - channel_means) / channel_stds
 
             dataset = AudioDataset(torch.Tensor(X))
@@ -145,7 +146,7 @@ class Dcase_Adapatask5(Inferenciador):
                     '6-3_ice-cream-truck', '7-1_person-or-small-group-talking',
                     '7-2_person-or-small-group-shouting', '7-3_large-crowd',
                     '7-4_amplified-speech', '8-1_dog-barking-whining'])
-            output_df['audio_filename'] = pd.Series('resultado', index=output_df.index)
+            output_df['audio_filename'] = pd.Series(ruta, index=output_df.index)
 
             for x in [
                     '1-X_engine-of-uncertain-size', '2-X_other-unknown-impact-machinery',
@@ -172,34 +173,34 @@ class Dcase_Adapatask5(Inferenciador):
                 "6_music", "7_human-voice", "8_dog"]
             output_df = output_df.loc[:, cols_in_order]
 
-            return output_df
+            return output_df.iloc[0]
         
         except Exception as e:
             print('Error en inferirAudio() '+str(e))
-            return None
+
+            raise
 
 
     def iniciarInferenciador(self,options):
 
         try:
+
+            self.data_path = options['data']+'/'
+
+
             #Download Model
 
-            if(not os.path.isfile('./data/model_system1')):
+            if(not os.path.isfile(self.data_path+'model_system1')):
                 print('Downloading model')
                 r = requests.get('https://github.com/sainathadapa/dcase2019-task5-urban-sound-tagging/releases/download/1.0/model_system1')
-                open('./data/model_system1', 'wb').write(r.content)
+                open(self.data_path+'model_system1', 'wb').write(r.content)
 
 
-            cuda = options['cuda']
-            self.device = torch.device('cuda:0' if cuda else 'cpu')
-            print('Device: ', self.device)
+            self.device = torch.device('cpu')
 
             self.model = Task5Model(31).to(self.device)
 
-            if cuda:
-                self.model.load_state_dict(torch.load('./data/model_system1'))
-            else:
-                self.model.load_state_dict(torch.load('./data/model_system1',map_location='cpu'))
+            self.model.load_state_dict(torch.load(self.data_path+'model_system1',map_location='cpu'))
             
             return True
 
@@ -207,7 +208,7 @@ class Dcase_Adapatask5(Inferenciador):
 
             print('Error en iniciarInferenciador() '+str(e))
 
-            return False
+            raise
 
     #adapa
 
@@ -226,20 +227,3 @@ class Dcase_Adapatask5(Inferenciador):
 
 
 ################################################
-
-def main():
-
-    inferenciador = Dcase_Adapatask5()
-
-    result = inferenciador.iniciarInferenciador({'cuda':True})
-
-    if result:
-
-        df = inferenciador.inferirAudio('/audios/05_001151.wav')
-
-        print(df)
-
-        df.to_csv('submission-system-1.csv', index=False)
-
-if __name__ == "__main__":
-    main()
