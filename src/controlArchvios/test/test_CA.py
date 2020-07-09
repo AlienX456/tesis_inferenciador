@@ -4,6 +4,7 @@ from sys import path
 
 
 path.append('src')
+path.append('interfaz')
 
 from controlArchivosLinux import ControlArchivosLinux
 
