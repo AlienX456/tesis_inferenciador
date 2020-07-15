@@ -64,25 +64,6 @@ class AudioDataset(Dataset):
                 dim=1)
         return sample
 
-################################################
-
-
-#preparación de datos log -MEl Spectogram (Obtenido de 02-compute-log-mel)
-
-def compute_melspec(filename):
-    wav = librosa.load(filename, sr=44100)[0]
-    melspec = librosa.feature.melspectrogram(
-        wav,
-        sr=44100,
-        n_fft=128*20,
-        hop_length=347*2,
-        n_mels=128,
-        fmin=20,
-        fmax=44100 // 2)
-    logmel = librosa.core.power_to_db(melspec)
-    return logmel
-
-
 ##############################################################################
 
 #CLASE PRINCIPAL
@@ -90,27 +71,56 @@ def compute_melspec(filename):
 class Dcase_Adapatask5(Inferenciador):
 
     def __init__(self):
+
+
+
         self.device = None
         self.model = None
         self.data_path = None
 
-    
-    #interfaz
-
-    def inferirAudio(self,ruta):
 
         try:
 
-            logmel = compute_melspec('/audios/'+ruta)
+            self.data_path = os.environ['DATA_PATH']
 
+            #Download Model
+
+            if(not os.path.isfile(self.data_path+os.environ['MODEL_NAME'])):
+                print('Downloading model')
+                r = requests.get(os.environ['MODEL_URL'])
+                open(self.data_path+os.environ['MODEL_NAME'], 'wb').write(r.content)
+
+
+            self.device = torch.device(os.environ['DEVICE_NAME'])
+
+            self.model = Task5Model(31).to(self.device)
+
+            self.model.load_state_dict(torch.load(self.data_path+os.environ['MODEL_NAME'],map_location=os.environ['DEVICE_NAME']))
+
+            self.channel_means = np.load(self.data_path+os.environ['CHANNEL_MEANS_FILE'])
+
+            self.channel_stds = np.load(self.data_path+os.environ['CHANNEL_STDS_FILE'])
+
+        except Exception as e:
+
+            print('Error Iniciando el inferenciador '+str(e))
+
+            raise
+
+    
+    #interfaz
+
+    def inferirAudio(self,nombre):
+
+        try:
+
+            logmel = self.compute_melspec(os.environ['AUDIO_PATH']+nombre)
 
             X = np.expand_dims(logmel.T[:635, :], axis=0)
 
             X = X[:, None, :, :]
 
-            channel_means = np.load(self.data_path+'channel_means.npy')
-            channel_stds = np.load(self.data_path+'channel_stds.npy')
-            X = (X - channel_means) / channel_stds
+            X = (X - self.channel_means) / self.channel_stds
 
             dataset = AudioDataset(torch.Tensor(X))
             loader = DataLoader(dataset, 64, shuffle=False)
@@ -146,7 +156,7 @@ class Dcase_Adapatask5(Inferenciador):
                     '6-3_ice-cream-truck', '7-1_person-or-small-group-talking',
                     '7-2_person-or-small-group-shouting', '7-3_large-crowd',
                     '7-4_amplified-speech', '8-1_dog-barking-whining'])
-            output_df['audio_filename'] = pd.Series(ruta, index=output_df.index)
+            output_df['audio_filename'] = pd.Series(nombre, index=output_df.index)
 
             for x in [
                     '1-X_engine-of-uncertain-size', '2-X_other-unknown-impact-machinery',
@@ -180,35 +190,6 @@ class Dcase_Adapatask5(Inferenciador):
 
             raise
 
-
-    def iniciarInferenciador(self,options):
-
-        try:
-
-            self.data_path = options['data']+'/'
-
-
-            #Download Model
-
-            if(not os.path.isfile(self.data_path+'model_system1')):
-                print('Downloading model')
-                r = requests.get('https://github.com/sainathadapa/dcase2019-task5-urban-sound-tagging/releases/download/1.0/model_system1')
-                open(self.data_path+'model_system1', 'wb').write(r.content)
-
-
-            self.device = torch.device('cpu')
-
-            self.model = Task5Model(31).to(self.device)
-
-            self.model.load_state_dict(torch.load(self.data_path+'model_system1',map_location='cpu'))
-            
-            return True
-
-        except Exception as e:
-
-            print('Error en iniciarInferenciador() '+str(e))
-
-            raise
 
     #adapa
 

@@ -9,7 +9,3 @@ class Inferenciador(ABC):
     @abstractmethod
     def inferirAudio(self,ruta):
         pass
-
-    @abstractmethod
-    def iniciarInferenciador(self,options):
-        pass
