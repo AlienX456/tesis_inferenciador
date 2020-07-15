@@ -46,7 +46,12 @@ class Control:
                 
                 for audio in lista:
 
-                    self.inferirAudio(audio)
+                    json = self.inferirAudio(audio)
+
+                    print('Removing'+self.audio_container_path+'/'+audio)
+
+                    self.controlArchivosLinux.borrarArchivo(self.audio_container_path+'/'+audio)
+
         
         except Exception as e:
 
@@ -64,6 +69,8 @@ class Control:
             r = requests.post(self.inferenciador_url + self.inferenciador_url_inderenciador, json={"audio_nombre":audio_nombre})
 
             print("Inferencia completada para audio :"+audio_nombre)
+
+            return r.json()
         
         except Exception as e:
 
