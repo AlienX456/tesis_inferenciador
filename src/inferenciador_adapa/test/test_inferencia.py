@@ -1,8 +1,15 @@
 from flask import json
+import os
+import requests
 
 def test_inferencia(app, client):
-    
-    res = client.post('/api/inferencia',json={"audio_nombre":"00_000277.wav"})
+
+    if(not os.path.isfile(os.environ['DATA_PATH']+os.environ['TEST_AUDIO_NAME'])):
+        print('Downloading Test Audio')
+        r = requests.get(os.environ['TEST_AUDIO_URL'])
+        open(os.environ['DATA_PATH']+os.environ['TEST_AUDIO_NAME'], 'wb').write(r.content)
+
+    res = client.post('/api/inferencia',json={"audio_nombre":os.environ['TEST_AUDIO_NAME']})
 
     assert res.status_code == 200
 

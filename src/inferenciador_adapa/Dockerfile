@@ -1,4 +1,4 @@
-from ubuntu:bionic
+FROM ubuntu:bionic
 
 RUN apt update &&\
     apt install -y software-properties-common &&\
@@ -14,11 +14,7 @@ COPY data/*  /inferenciador/data/
 
 WORKDIR /inferenciador/adapa/
 
-
 RUN pip3 install -r /inferenciador/adapa/requirements.txt
-
-WORKDIR /inferenciador/api
 
 EXPOSE 5000
 
-CMD ["python3","api.py"]
