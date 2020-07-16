@@ -9,12 +9,16 @@ RUN apt update &&\
 
 
 COPY requirements.txt /inferenciador/
+
+RUN pip3 install -r /inferenciador/requirements.txt
+
 COPY adapa/dcase_adapatask5.py /inferenciador/adapa/
 COPY api/api.py /inferenciador/api/
 COPY interfaz/__init__.py interfaz/inferenciador.py /inferenciador/interfaz/
 COPY data/*  /inferenciador/data/
+COPY test/*  /inferenciador/test/
 
-RUN pip3 install -r /inferenciador/requirements.txt
+
 
 
 EXPOSE 5000

@@ -9,7 +9,7 @@ def test_inferencia(app, client):
         r = requests.get(os.environ['TEST_AUDIO_URL'])
         open(os.environ['DATA_PATH']+os.environ['TEST_AUDIO_NAME'], 'wb').write(r.content)
 
-    res = client.post('/api/inferencia',json={"audio_nombre":os.environ['TEST_AUDIO_NAME']})
+    res = client.post(os.environ['INFERENCIA_URL'],json={"audio_nombre":os.environ['TEST_AUDIO_NAME']})
 
     assert res.status_code == 200
 
