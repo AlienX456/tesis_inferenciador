@@ -27,6 +27,7 @@ jobs:
             docker build -t alienx456/inferencia-adapa .
             echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
             docker push alienx456/inferencia-adapa
+            docker run --workdir /inferenciador/ --env-file test_env_vars.env --rm alienx456/inferencia-adapa pytest
   test-inferencia-adapa:
     docker:
       - image: alienx456/inferencia-adapa:latest
@@ -54,7 +55,7 @@ workflows:
   main:
     jobs:
       - build-inferencia-adapa
-      - test-inferencia-adapa:
-          requires:
-            - build-inferencia-adapa
-      - test-control-archivos
+      # - test-inferencia-adapa:
+      #     requires:
+      #       - build-inferencia-adapa
+      # - test-control-archivos
