@@ -16,7 +16,7 @@ jobs:
           name: Test
   build-inferencia-adapa:
     docker:
-      - image: circleci/golang:1.13-alpine
+      - image: circleci/golang:1.13.13-buster
     steps:
       - checkout
       - setup_remote_docker
