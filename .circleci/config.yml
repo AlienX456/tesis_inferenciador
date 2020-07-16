@@ -55,7 +55,7 @@ workflows:
   main:
     jobs:
       - build-inferencia-adapa
-      - test-inferencia-adapa
-        requires:
-          - build-inferencia-adapa
+      - test-inferencia-adapa:
+          requires:
+            - build-inferencia-adapa
       - test-control-archivos
