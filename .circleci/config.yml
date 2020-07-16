@@ -14,8 +14,25 @@ jobs:
           working_directory: src/controlArchvios/
           command: pytest test/
           name: Test
+  build-inferencia-adapa:
+    docker:
+      - image: circleci/golang:1.13-alpine
+    steps:
+      - checkout
+      - setup_remote_docker:
+        docker_layer_caching: true
+      - run:
+          workdir: src/inferenciador_adapa/
+          name: Build docker image 
+          command: |
+            TAG=0.1.$CIRCLE_BUILD_NUM
+            docker build -t alienx456/inferencia-adapa:$TAG .
+            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+            docker push alienx456/inferencia-adapa:$TAG
+
 
 workflows:
   main:
     jobs:
+      - build-inferencia-adapa
       - test-control-archivos
