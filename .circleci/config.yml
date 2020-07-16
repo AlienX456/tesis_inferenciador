@@ -19,8 +19,7 @@ jobs:
       - image: circleci/golang:1.13-alpine
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - setup_remote_docker
       - run:
           workdir: src/inferenciador_adapa/
           name: Build docker image 
