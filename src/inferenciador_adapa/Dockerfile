@@ -7,6 +7,7 @@ RUN apt update &&\
     pip3 install https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp36-cp36m-linux_x86_64.whl &&\
     pip3 install flask-restful
 
+RUN apt -y install ffmpeg
 
 COPY requirements.txt /inferenciador/
 
