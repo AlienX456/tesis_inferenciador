@@ -9,12 +9,12 @@ jobs:
       - run:
           working_directory: src/controlArchvios/
           command: pip install -r requirements.txt
-          name: Install requirements
+          name: Instalando requerimientos
       - run:
           working_directory: src/controlArchvios/
           command: pytest test/
-          name: Test
-  build-inferencia-adapa:
+          name: Realizando Test Unitarios
+  build-test-inferencia-adapa:
     docker:
       - image: circleci/golang:1.13.13-buster
     steps:
@@ -22,40 +22,21 @@ jobs:
       - setup_remote_docker
       - run:
           workdir: src/inferenciador_adapa/
-          name: Contruyendo imagen y publicando 
+          name: Contruyendo imagen
+          command: docker build -t alienx456/inferencia-adapa .
+      - run:
+          workdir: src/inferenciador_adapa/
+          name: Realizando Test Unitarios
+          command: docker run --workdir /inferenciador/ --env-file test_env_vars.env --rm alienx456/inferencia-adapa pytest
+      - run:
+          workdir: src/inferenciador_adapa/
+          name: Publicando imagen
           command: |
-            docker build -t alienx456/inferencia-adapa .
-            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-            docker push alienx456/inferencia-adapa
-            docker run --workdir /inferenciador/ --env-file test_env_vars.env --rm alienx456/inferencia-adapa pytest
-  test-inferencia-adapa:
-    docker:
-      - image: alienx456/inferencia-adapa:latest
-    environment:
-      DATA_PATH: /inferenciador/data/
-      MODEL_NAME: model_system1
-      MODEL_URL: https://github.com/sainathadapa/dcase2019-task5-urban-sound-tagging/releases/download/1.0/model_system1
-      DEVICE_NAME: cpu
-      AUDIO_PATH: /inferenciador/data/
-      CHANNEL_MEANS_FILE: channel_means.npy
-      CHANNEL_STDS_FILE: channel_stds.npy
-      TEST_AUDIO_URL: http://download1641.mediafire.com/z2g1dernqxug/s56q443hq4r3gm4/test_audio.wav
-      TEST_AUDIO_NAME: test_audio.wav
-      INFERENCIA_URL: /api/inferencia
-    steps:
-      - run: 
-          name: Realizando pruebas sobre el inferenciador
-          workdir: /inferenciador/
-          command: pytest
-
-
-
+              echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+              docker push alienx456/inferencia-adapa
 
 workflows:
   main:
     jobs:
-      - build-inferencia-adapa
-      # - test-inferencia-adapa:
-      #     requires:
-      #       - build-inferencia-adapa
-      # - test-control-archivos
+      - build-test-inferencia-adapa
+      - test-control-archivos
