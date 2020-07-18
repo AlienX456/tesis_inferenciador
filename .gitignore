@@ -4,3 +4,8 @@ src/__pycache__
 src/interfaces/__pycache__
 .pytest_cache
 src/inferenciador_adapa/data/model_system1
+src/inferenciador_adapa/test_env.sh
+src/inferenciador_adapa/data/test_audio.wav
+src/inferenciador_adapa/test-run-docker.txt
+src/inferenciador_adapa/runcontainer.sh
+src/controlArchvios/env.sh

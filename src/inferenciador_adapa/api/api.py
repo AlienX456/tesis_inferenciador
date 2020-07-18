@@ -15,11 +15,6 @@ from dcase_adapatask5 import Dcase_Adapatask5
 
 inferenciador = Dcase_Adapatask5()
 
-@app.route('/api/inicioinferenciador', methods=['GET'])
-def iniciarInferenciador():
-    resultado = inferenciador.iniciarInferenciador({'data':os.path.abspath("../data")})
-    return {'estado_inicio':resultado}
-
 @app.route('/api/inferencia', methods=['POST'])
 def inferirAudio():
     data = request.get_json()

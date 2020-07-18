@@ -9,13 +9,34 @@ jobs:
       - run:
           working_directory: src/controlArchvios/
           command: pip install -r requirements.txt
-          name: Install requirements
+          name: Instalando requerimientos
       - run:
           working_directory: src/controlArchvios/
           command: pytest test/
-          name: Test
+          name: Realizando Test Unitarios
+  build-test-inferencia-adapa:
+    docker:
+      - image: circleci/golang:1.13.13-buster
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          workdir: src/inferenciador_adapa/
+          name: Contruyendo imagen
+          command: docker build -t alienx456/inferencia-adapa .
+      - run:
+          workdir: src/inferenciador_adapa/
+          name: Realizando Test Unitarios
+          command: docker run --workdir /inferenciador/ --env-file test_env_vars.env --rm alienx456/inferencia-adapa pytest
+      - run:
+          workdir: src/inferenciador_adapa/
+          name: Publicando imagen
+          command: |
+              echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+              docker push alienx456/inferencia-adapa
 
 workflows:
   main:
     jobs:
+      - build-test-inferencia-adapa
       - test-control-archivos
